@@ -1,25 +1,25 @@
 /*
- * This is the main part of the simulation of the TA version of the model 
+ * This is the main part of the simulation of the SPC version of the model 
  */
 
 import java.util.*;
  
-public class TAGridStatic {
+public class SPCGridStatic {
 
-	public ArrayList <TACell> tissue;// List of cells that make up the tissue
+	public ArrayList <SPCCell> tissue;// List of cells that make up the tissue
 	private Random rand = new Random();
 	public static int maxlineage;//probably static is  unnecessary
 	public int gsize;
 	
-	public TAGridStatic(int size, int maxC, double frac, boolean justSC) {//beth: this is the constructor
-		// Create new instance of simulation with size of grid maximum TA cycle and fraction of stem cells 
-	    TACell.maxCycle = maxC+1;// (see TACell)
+	public SPCGridStatic(int size, int maxC, double frac, boolean justSC) {//beth: this is the constructor
+		// Create new instance of simulation with size of grid maximum SPC cycle and fraction of stem cells 
+	    SPCCell.maxCycle = maxC+1;// (see SPCCell)
 	    gsize = size;
-		TABoxStatic[][] grid = new TABoxStatic[size][size];
+		SPCBoxStatic[][] grid = new SPCBoxStatic[size][size];
         //beth: matrix of dimensions sizexsize containing homes, and called 'grid'
 		// Temporary 2D array to hold boxes in Cartesian grid so that connections can be made
 
-		tissue = new ArrayList<TACell>();// Creates the list structure for the cells that constitute the tissue
+		tissue = new ArrayList<SPCCell>();// Creates the list structure for the cells that constitute the tissue
         if (justSC) placecolonies(grid,maxC,frac);
         else fillwithcells(grid,maxC,frac);
         //note grid contents will be changed by method bcos I am passing a pointer to the grid 
@@ -37,33 +37,33 @@ public class TAGridStatic {
 			}
 	    } 
 		//reset the values in the static cell counting arrays
-		TACell.resetstaticcounters();
+		SPCCell.resetstaticcounters();
 	}//beth: end of constructor
-	private void fillwithcells(TABoxStatic[][] grid,int maxC,double frac){
+	private void fillwithcells(SPCBoxStatic[][] grid,int maxC,double frac){
 		int x,y,k;
 		int lineage =0;
-		TACell cell;//just a name to use for each cell as it is placed in a home in the grid
-		int sc = (int)(gsize*gsize*frac);//beth: 64 hard coded.could use size
+		SPCCell cell;//just a name to use for each cell as it is placed in a home in the grid
+		int sc = (int)(gsize*gsize*frac);
 		for (k = 0; k < gsize; k++) {
 			x = k;
         	for(y=0;y<k;y++){
-			    grid[x][y] = new TABoxStatic(x,y);// New instance of TABox created and added to 2D grid
-				cell = new TACell(grid[x][y],lineage);// New instance of TACell created and given unique lineage id
-				grid[x][y].occupant = cell;// The new cell is added to the TABox
-				cell.type=rand.nextInt(maxC)+2;// Cell type set randomly to either TA_1,TA_2,TA_3 or TA_4
+			    grid[x][y] = new SPCBoxStatic(x,y);// New instance of SPCBox created and added to 2D grid
+				cell = new SPCCell(grid[x][y],lineage);// New instance of SPCCell created and given unique lineage id
+				grid[x][y].occupant = cell;// The new cell is added to the SPCBox
+				cell.type=2;
 				tissue.add(cell);// Add new cell to list of cells that constitute the tissue
 				lineage++;
-			    grid[y][x] = new TABoxStatic(y,x);// New instance of TABox created and added to 2D grid
-				cell = new TACell(grid[y][x],lineage);// New instance of TACell created and given unique lineage id
-				grid[y][x].occupant = cell;// The new cell is added to the TABox
-				cell.type=rand.nextInt(maxC)+2;// Cell type set randomly to either TA_1,TA_2,TA_3 or TA_4
+			    grid[y][x] = new SPCBoxStatic(y,x);// New instance of SPCBox created and added to 2D grid
+				cell = new SPCCell(grid[y][x],lineage);// New instance of SPCCell created and given unique lineage id
+				grid[y][x].occupant = cell;// The new cell is added to the SPCBox
+				cell.type=2;
 				tissue.add(cell);// Add new cell to list of cells that constitute the tissue
 				lineage++;
 			}
-		    grid[k][k] = new TABoxStatic(k,k);// New instance of TABox created and added to 2D grid
-			cell = new TACell(grid[k][k],lineage);// New instance of TACell created and given unique lineage id
-			grid[k][k].occupant = cell;// The new cell is added to the TABox
-			cell.type=rand.nextInt(maxC)+2;// Cell type set randomly to either TA_1,TA_2,TA_3 or TA_4
+		    grid[k][k] = new SPCBoxStatic(k,k);// New instance of SPCBox created and added to 2D grid
+			cell = new SPCCell(grid[k][k],lineage);// New instance of SPCCell created and given unique lineage id
+			grid[k][k].occupant = cell;// The new cell is added to the SPCBox
+			cell.type=2;
 			tissue.add(cell);// Add new cell to list of cells that constitute the tissue
 			lineage++;
 		}
@@ -79,30 +79,30 @@ public class TAGridStatic {
 		
 	}
 	
-	private void placecolonies(TABoxStatic[][] grid,int maxC,double frac){
+	private void placecolonies(SPCBoxStatic[][] grid,int maxC,double frac){
 		int x,y,k;
 		int lineage = 0;
-		TACell cell;//just a name to use for each cell as it is placed in a home in the grid
+		SPCCell cell;//just a name to use for each cell as it is placed in a home in the grid
 		int sc = (int)(gsize*gsize*frac);//beth: 64 hard coded.could use size
 		//System.out.println("sc "+sc);
 		for (k = 0; k < gsize; k++) {
 			x = k;
         	for(y=0;y<k;y++){
-			    grid[x][y] = new TABoxStatic(x,y);// New instance of TABox created and added to 2D grid
-				cell = new TACell(grid[x][y],lineage);// New instance of TACell created and given unique lineage id
-				grid[x][y].occupant = cell;// The new cell is added to the TABox
+			    grid[x][y] = new SPCBoxStatic(x,y);// New instance of SPCBox created and added to 2D grid
+				cell = new SPCCell(grid[x][y],lineage);// New instance of SPCCell created and given unique lineage id
+				grid[x][y].occupant = cell;// The new cell is added to the SPCBox
 				cell.type=0;// space
 				tissue.add(cell);// Add new cell to list of cells that constitute the tissue
-			    grid[y][x] = new TABoxStatic(y,x);// New instance of TABox created and added to 2D grid
-				cell = new TACell(grid[y][x],lineage);// New instance of TACell created and given unique lineage id
-				grid[y][x].occupant = cell;// The new cell is added to the TABox
-				cell.type=0;// Cell type set randomly to either TA_1,TA_2,TA_3 or TA_4
+			    grid[y][x] = new SPCBoxStatic(y,x);// New instance of SPCBox created and added to 2D grid
+				cell = new SPCCell(grid[y][x],lineage);// New instance of SPCCell created and given unique lineage id
+				grid[y][x].occupant = cell;// The new cell is added to the SPCBox
+				cell.type=0;// Cell type set randomly to either SPC_1,SPC_2,SPC_3 or SPC_4
 				tissue.add(cell);// Add new cell to list of cells that constitute the tissue
 			}
-		    grid[k][k] = new TABoxStatic(k,k);// New instance of TABox created and added to 2D grid
-			cell = new TACell(grid[k][k],lineage);// New instance of TACell created and given unique lineage id
-			grid[k][k].occupant = cell;// The new cell is added to the TABox
-			cell.type=0;// Cell type set randomly to either TA_1,TA_2,TA_3 or TA_4
+		    grid[k][k] = new SPCBoxStatic(k,k);// New instance of SPCBox created and added to 2D grid
+			cell = new SPCCell(grid[k][k],lineage);// New instance of SPCCell created and given unique lineage id
+			grid[k][k].occupant = cell;// The new cell is added to the SPCBox
+			cell.type=0;// Cell type set randomly to either SPC_1,SPC_2,SPC_3 or SPC_4
 			tissue.add(cell);// Add new cell to list of cells that constitute the tissue
 		}
 		maxlineage = sc+1;//stem cells and spaces
@@ -126,7 +126,7 @@ public class TAGridStatic {
 	}
 	
 	public void stain(){ // Stains all cells in the tissue list
-		for (TACell c : tissue) {
+		for (SPCCell c : tissue) {
 		    if(c.type>0){
 				c.stain=1.0;
 			}
@@ -135,10 +135,10 @@ public class TAGridStatic {
 
 	public void iterate() { // The main iterative loop of the simulation
 		//beth: 
-        TACell cHold;
+        SPCCell cHold;
 		// Create a list to hold cells that are spaces or have the capacity to detach
-        ArrayList<TACell> growArray = new ArrayList<TACell>();
-        for (TACell c : tissue) { // loop through the tissue (ArrayList of cells)
+        ArrayList<SPCCell> growArray = new ArrayList<SPCCell>();
+        for (SPCCell c : tissue) { // loop through the tissue (ArrayList of cells)
 		    c.maintain(); // Calls each cell to maintain its state re: detach and/or grow
 			if(c.type==0)growArray.add(c); // If cell is a space add to grow list
 			if(c.canDetach)growArray.add(c);// If cell can detach add to grow list
@@ -151,10 +151,10 @@ public class TAGridStatic {
 	}
 	public void iterateandcount() {
 		//beth: 
-        TACell cHold;
+        SPCCell cHold;
 		// Create a list to hold cells that are spaces or have the capacity to detach
-        ArrayList<TACell> growArray = new ArrayList<TACell>();
-        for (TACell c : tissue) { // loop through the tissue (ArrayList of cells)
+        ArrayList<SPCCell> growArray = new ArrayList<SPCCell>();
+        for (SPCCell c : tissue) { // loop through the tissue (ArrayList of cells)
 		    c.maintainandcount(); // Calls each cell to maintain its state re: detach and/or grow
 			if(c.type==0)growArray.add(c); // If cell is a space add to grow list
 			if(c.canDetach)growArray.add(c);// If cell can detach add to grow list

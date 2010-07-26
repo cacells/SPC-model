@@ -1,19 +1,20 @@
 /*
- * This contains the classes for the Cell object for the TA version of the model
+ * This contains the classes for the Cell object for the SPC version of the model
  */
 
 import java.util.*;
 
-class TACell{
-	public static int maxCycle = 5; // this sets the TAmax to 4 (see type)
+class SPCCell{
+	public static int maxCycle = 2; // number of different cell types
 	public static Random rand = new Random();
+	public static double TAFraction = 1.0 - 2.0*0.08;// The probability of a producing EP and PMB
 	static Integer[] neighbours = {0,1,2,3,4,5,6,7};
 
 	public boolean canDetach, canGrow,proliferated;
-	public int type; // 0 = space, 1 = SC, 2=TA_1....5=TA_4
-	public TABoxStatic home;// The box the cell sits in
+	public int type; // 0 = space, 1 = EP, 2=PMB
+	public SPCBoxStatic home;// The box the cell sits in
 	public double stain;
-	public double scRate=1.0;// Relative SC proliferation rate if scRate = 0.5 SC proliferation rate would be half TA rate
+	public double scRate=1.0;// Relative SC proliferation rate if scRate = 0.5 SC proliferation rate would be half SPC rate
 	public int lineage;
 	
 	public static int[] cellcounts=new int[maxCycle+1];
@@ -21,7 +22,7 @@ class TACell{
 	public static double[] stainsums=new double[maxCycle+1];
 	public static int totalproliferations=0;
 	
-	public TACell(TABoxStatic home,int lin){
+	public SPCCell(SPCBoxStatic home,int lin){
 		this.home=home;
 		lineage = lin;
 		canDetach=false;
@@ -39,26 +40,33 @@ class TACell{
 		}
 	}
 	
-	public void maintain(){// Determines if a Cell can detach or grow and sets counters
-		//beth: sets which counters?
-		canDetach=(type>=maxCycle);// For standard TA model only TA_4 can detach
-		canGrow = ((type>0)&&(type<maxCycle));// For standard TA model only TA_4 can't grow
-		if(type==1)canGrow=(rand.nextDouble()<scRate);// Rate can be different for SC (see above)
+	public void maintain(){// Determines if a Cell can detach or grow 
+		canDetach=(type==maxCycle);// For standard SPC model only PMB can detach
+		canGrow = (type==1);// For standard SPC model only EP can grow
 		proliferated = false;
 	}
 	
-	public void maintainandcount(){// Determines if a Cell can detach or grow and sets counters
+	public void maintainandcount(){// Determines if a Cell can detach or grow and counts
 		cellcounts[type]++;
 		stainsums[type] = stainsums[type] + stain;
-		canDetach=(type>=maxCycle);// For standard TA model only TA_4 can detach
-		canGrow = ((type>0)&&(type<maxCycle));// For standard TA model only TA_4 can't grow
-		if(type==1)canGrow=(rand.nextDouble()<scRate);// Rate can be different for SC (see above)
+		canDetach=(type==maxCycle);// For standard SPC model only PMB can detach
+		canGrow = (type==1);// For standard SPC model only EP can grow
 		proliferated = false;
 	}
 	
-	public void growth(TACell cHold){ // Growth occurs into cell. chold is the neighbour that is taking over
-			type=cHold.type+1; // Takes on type+1 of cell that is proliferating if SC type = 1+1 if TA_3 type = 3+1 
-			if(cHold.type>1)cHold.type++; // If proliferating cell is not an SC it to increases its type
+	public void growth(SPCCell cHold){ // Growth occurs into cell. chold is the neighbour that is taking over
+		if(cHold.type==1){// only SC can proliferate
+			if(rand.nextDouble()<TAFraction){ // The progenitor cell will be a PMB and parent stays as EP
+				type=2;
+			}else{ // if not
+				if(rand.nextDouble()<0.5){ // then there is an equal probability that the cell will be
+					type=1; //another EP
+				}else{
+					type=2;  // or that both cells will be PMB
+					cHold.type=2;
+				}
+			}
+		}		
 			canGrow=false;// New cell will not proliferate again in this iteration
 			cHold.canGrow=false;// Proliferating cell will not proliferate again in this iteration
 			cHold.proliferated=true;// The proliferating cell has proliferated
@@ -66,11 +74,22 @@ class TACell{
 			stain = cHold.stain;// As above
 			lineage = cHold.lineage;// New cell takes on lineage of proliferating cell 
 	}
-	public void growthandcount(TACell cHold){
+	public void growthandcount(SPCCell cHold){
 		totalproliferations++;
 		prolifcounts[cHold.type]++;
-		type=cHold.type+1; // Takes on type+1 of cell that is proliferating if SC type = 1+1 if TA_3 type = 3+1 
-		if(cHold.type>1)cHold.type++; // If proliferating cell is not an SC it to increases its type
+		if(cHold.type==1){// only SC can proliferate
+			if(rand.nextDouble()<TAFraction){ // The progenitor cell will be a PMB and parent stays as EP
+				type=2;
+			}else{ // if not
+				if(rand.nextDouble()<0.5){ // then there is an equal probability that the cell will be
+					type=1; //another EP
+				}else{
+					type=2;  // or that both cells will be PMB
+					cHold.type=2;
+				}
+			}
+		}
+		
 		canGrow=false;// New cell will not proliferate again in this iteration
 		cHold.canGrow=false;// Proliferating cell will not proliferate again in this iteration
 		cHold.proliferated=true;// The proliferating cell has proliferated
@@ -83,7 +102,7 @@ class TACell{
 		int sizeA = home.neighbours.size();
         int a = rand.nextInt(sizeA);// Pick starting point in list of neighbours
         int b;
-		TACell cHold;
+		SPCCell cHold;
         for(int i=0;i<sizeA;i++){ // Loop from starting point through list of neighbours
 			b = (rand.nextInt(sizeA)+a)%sizeA;//beth: not convinced this gets all neighbours
 			cHold = home.getNeighbour(b);
@@ -98,7 +117,7 @@ class TACell{
 		int sizeA = 8;//always 8 neighbours - otherwise this method needs changing
 		ArrayList<Integer> nlist = new ArrayList<Integer>(Arrays.asList(neighbours));//initialise nlist
         int a,b;
-		TACell cHold;
+		SPCCell cHold;
         for(int i=0;i<sizeA;i++){ // Loop from starting point through list of neighbours
         	a = rand.nextInt(nlist.size());//pick random list index
         	b = nlist.remove(a);//use the value at that index and make the list smaller
@@ -114,7 +133,7 @@ class TACell{
 		int sizeA = 8;//always 8 neighbours - otherwise this method needs changing
 		ArrayList<Integer> nlist = new ArrayList<Integer>(Arrays.asList(neighbours));//initialise nlist
         int a,b;
-		TACell cHold;
+		SPCCell cHold;
         for(int i=0;i<sizeA;i++){ // Loop from starting point through list of neighbours
         	a = rand.nextInt(nlist.size());//pick random list index
         	b = nlist.remove(a);//use the value at that index and make the list smaller

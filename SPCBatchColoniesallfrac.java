@@ -75,12 +75,13 @@ import java.io.*;
 	    double[][] epsColours;
 	    boolean writeImages = false;
 	    boolean showImages = false;
+	    boolean justsc = false;//just stem cells or space filled tissue????
 
 		public TABatchColoniesallfrac(int size) {
 			//if size ne 64 we are in trouble
 		    gSize=size;
 			setVisible(true);
-
+            
 					
 			backImg1 = createImage(scale * size, scale * size);
 			backGr1 = backImg1.getGraphics();
@@ -199,6 +200,7 @@ import java.io.*;
 	      	    CApicture.clearCAPanel(2);
 	      	    CApicture.clearParent();
 			    iterations=0;
+			    if (!justsc) lineagecount = new int[replicates][maxIters][lin];
 		}
 		
 		
@@ -222,15 +224,24 @@ import java.io.*;
 			        fracVal.setVisible(true);
 					fracVal.setText(""+frac);
 					
+					if (justsc){
+						int sc = (int)(gSize*gSize*frac);//number of stem cells
+						lineagecount = new int[replicates][maxIters][sc+1];
+						System.out.println("size "+replicates+" "+maxIters+" "+sc);
 
-					int sc = (int)(gSize*gSize*frac);//number of stem cells
-					lineagecount = new int[replicates][maxIters][sc+1];
-					System.out.println("size "+replicates+" "+maxIters+" "+sc);
-					
+					}
+					else{
+						for (int i=0;i<replicates;i++){
+							for (int j=0;j<maxIters;j++){
+								for (int k=0;k<lin;k++) lineagecount[i][j][k]=0;
+							}
+						}
+						
+					}
 					for(int r=0; r<replicates; r++){
 
 						progressBarRep.setValue(r+1);
-						experiment = new TAGridStatic(64, celltypes-2, frac,false);//new experiment
+						experiment = new TAGridStatic(64, celltypes-2, frac,justsc);//new experiment
 						
 						lin = TAGridStatic.maxlineage;
 
